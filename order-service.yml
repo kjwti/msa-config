@@ -1,15 +1,23 @@
 spring:
   application:
-    name: order-service
-  cloud:
-    openfeign:
-      circuitbreaker:
-        enabled: true  # 🔥 이 설정이 없으면 fallback이 동작하지 않음
+    name: order-service  # 서비스 이름과 Git 파일 이름 일치
+  config:
+    import: optional:configserver:http://config-server:8888
+  kafka:
+    bootstrap-servers: kafka:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-server:
-  port: 8082
+management:
+  tracing:
+    sampling:
+      probability: 1.0  # 모든 요청 추적
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
+  endpoints:
+    web:
+      exposure:
+        include: '*'
